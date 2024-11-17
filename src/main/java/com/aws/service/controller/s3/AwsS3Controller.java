@@ -4,14 +4,10 @@ package com.aws.service.controller.s3;
 import com.aws.service.exception.CustomException;
 import com.aws.service.response.CommonResponse;
 import com.aws.service.service.FileService;
-import com.aws.service.service.s3.AwsS3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -30,7 +26,7 @@ public class AwsS3Controller {
                 response.setMessage("Please select a file to upload");
                 return ResponseEntity.badRequest().body(response);
             }
-            response = fileService.uploadFile(file,"test-path/"); //provide the test path according to the requirement
+            response = fileService.uploadFile(file, "test-path/"); //provide the test path according to the requirement
             response.setStatus(HttpStatus.CREATED);
             return ResponseEntity.ok(response);
         } catch (CustomException ce) {
@@ -44,7 +40,26 @@ public class AwsS3Controller {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
     // file list
+    @GetMapping("file/list")
+    public ResponseEntity<CommonResponse> listFiles() {
+        CommonResponse response = new CommonResponse();
+        try {
+            response = fileService.listFiles();
+        } catch (CustomException ce) {
+            ce.printStackTrace();
+            response.setMessage(ce.getMessage());
+            response.setStatus(ce.getHttpStatus());
+            return ResponseEntity.status(ce.getHttpStatus()).body(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage(e.getMessage());
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        return ResponseEntity.ok(response);
+    }
 
     // file download
 

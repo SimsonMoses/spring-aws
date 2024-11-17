@@ -52,4 +52,17 @@ public class FileServiceImpl implements FileService {
         }
         return response;
     }
+
+    @Override
+    public CommonResponse listFiles() throws CustomException {
+        CommonResponse response = new CommonResponse();
+        try {
+            response.setData(awsService.listFiles(bucketName)); // TODO: get the bucket name dynamically
+            response.setMessage("Files found in bucket(" + bucketName + ")");
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        return response;
+    }
 }
